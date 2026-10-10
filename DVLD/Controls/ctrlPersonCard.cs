@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace DVLD.Controls
@@ -17,16 +18,13 @@ namespace DVLD.Controls
     {
         private int _PersonID = -1;
         private clsPerson _Person = new clsPerson();
-
         public byte PersonAge
         {
             get
             {
                 if (_Person == null) return 0;
-
                 byte age = (byte)(DateTime.Now.Year - _Person.DateOfBirth.Year);
-                if (_Person.DateOfBirth.Date > DateTime.Now.AddYears(-age))
-                    age--;
+                if (_Person.DateOfBirth.Date > DateTime.Now.AddYears(-age)) age--;
                 return age;
             }
         }
@@ -36,30 +34,35 @@ namespace DVLD.Controls
             InitializeComponent();
         }
 
-        private bool _RefreshPersonCard(clsPerson Person)
+        private void _LoadPersonImage()
         {
-            _PersonID = Person.PersonID;
-            lblPersonID.Text = _PersonID.ToString();
-            lblName.Text = Person.FirstName + " " + Person.SecondName + " " + Person.ThirdName + Person.LastName;
-            lblNationalNo.Text = Person.NationalNumber;
-            lblGendor.Text = (Person.Gendor == 0) ? "Male" : "Female";
-            lblEmail.Text = Person.Email;
-            lblAddress.Text = Person.Address;
-            lblDateOfBirth.Text = Person.DateOfBirth.ToString();
-            lblPhone.Text = Person.Phone;
-            lblCountry.Text = clsCountry.Find(Person.NationalCountryID).CountryName;
+            pbPersonImage.Image = (_Person.Gendor == 0) ? Properties.Resources.Male_512 : Properties.Resources.Female_512;
 
-            if (string.IsNullOrEmpty(Person.ImagePath))
-                pbPersonImage.Image = (Person.Gendor == 0) ? Properties.Resources.Male_512 : Properties.Resources.Female_512;
+            if (!string.IsNullOrEmpty(_Person.ImagePath) && File.Exists(_Person.ImagePath))
+                pbPersonImage.ImageLocation = _Person.ImagePath;
             else
-                pbPersonImage.Load(Person.ImagePath);
+                MessageBox.Show("Could not find this image: = " + _Person.ImagePath, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            return true;
+        }
+
+        private void _RefreshPersonCard()
+        {
+            _PersonID = _Person.PersonID;
+            lblPersonID.Text = _PersonID.ToString();
+            lblName.Text = _Person.FullName;
+            lblGendor.Text = (_Person.Gendor == 0) ? "Male" : "Female";
+            lblEmail.Text = _Person.Email;
+            lblAddress.Text = _Person.Address;
+            lblDateOfBirth.Text = _Person.DateOfBirth.ToString();
+            lblPhone.Text = _Person.Phone;
+            lblCountry.Text = clsCountry.Find(_Person.NationalCountryID).CountryName;
+            _LoadPersonImage();
         }
 
         public void ResetDefaultValues()
         {
             _PersonID = -1;
+            _Person = null;
             lblPersonID.Text = "[???]";
             lblName.Text = "[???]";
             lblNationalNo.Text = "[???]";
@@ -72,57 +75,44 @@ namespace DVLD.Controls
             pbPersonImage.Image = Properties.Resources.Male_512;
         }
 
-        private int _FindPerson(int PersonID)
+        private void lblEditPersonLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            frmAddEditPerson frm = new frmAddEditPerson(_PersonID);
+            frm.ShowDialog();
+            FillCardWithData(_PersonID);
+        }
+
+        public int FillCardWithData(int PersonID)
         {
             _Person = clsPerson.Find(PersonID);
-
             if (_Person == null)
             {
                 ResetDefaultValues();
-                return -1;
+                MessageBox.Show("No Person with PersonID = " + PersonID.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return -1;
             }
 
-            _RefreshPersonCard(_Person);
+            _RefreshPersonCard();
             return _Person.PersonID;
         }
 
-        private int _FindPerson(string NationalNumber)
+        public int FillCardWithData(string NationalNumber)
         {
-            if(string.IsNullOrEmpty(NationalNumber))
+            if (string.IsNullOrWhiteSpace(NationalNumber))
             {
                 ResetDefaultValues();
                 return -1;
             }
 
             _Person = clsPerson.Find(NationalNumber.Trim());
-
             if (_Person == null)
             {
                 ResetDefaultValues();
+                MessageBox.Show("No Person with National No. = " + NationalNumber.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
 
-            _RefreshPersonCard(_Person);
-
+            _RefreshPersonCard();
             return _Person.PersonID;
-        }
-
-        private void lblEditPersonLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            frmAddEditPerson frm = new frmAddEditPerson(_PersonID);
-            frm.ShowDialog();
-
-            _FindPerson(_PersonID);
-        }
-
-        public int FillCardWithData(int PersonID)
-        {
-            return _FindPerson(PersonID);
-        }
-
-        public int FillCardWithData(string NationalNumber)
-        {
-            return _FindPerson(NationalNumber);
         }
     }
 }

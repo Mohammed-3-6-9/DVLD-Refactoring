@@ -23,6 +23,11 @@ namespace Business_Logic
         public string SecondName { get; set; }
         public string ThirdName { get; set; }
         public string LastName { get; set; }
+        public string FullName
+        {
+            get { return FirstName + " " + SecondName + " " + ThirdName + " " + LastName; }
+
+        }
         public DateTime DateOfBirth { get; set; }
         public byte Gendor { get; set; }
         public string Address { get; set; }

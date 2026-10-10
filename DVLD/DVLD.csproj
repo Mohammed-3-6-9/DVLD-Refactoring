@@ -73,6 +73,12 @@
     <Compile Include="ApplicationForms\frmManageInternationalLicenseApplications.Designer.cs">
       <DependentUpon>frmManageInternationalLicenseApplications.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ctrlPersonCardWithFilter.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ctrlPersonCardWithFilter.Designer.cs">
+      <DependentUpon>ctrlPersonCardWithFilter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Detain Release\frmManageDetainedLicenses.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -217,6 +223,12 @@
     <Compile Include="Licenses\internationalLicenses\frmInterNationalLicenseInfo.Designer.cs">
       <DependentUpon>frmInterNationalLicenseInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="People\frmFindPerson.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="People\frmFindPerson.Designer.cs">
+      <DependentUpon>frmFindPerson.cs</DependentUpon>
+    </Compile>
     <Compile Include="Test Types\frmManageTestTypes.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -303,6 +315,9 @@
     <EmbeddedResource Include="ApplicationForms\frmManageInternationalLicenseApplications.resx">
       <DependentUpon>frmManageInternationalLicenseApplications.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ctrlPersonCardWithFilter.resx">
+      <DependentUpon>ctrlPersonCardWithFilter.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Detain Release\frmManageDetainedLicenses.resx">
       <DependentUpon>frmManageDetainedLicenses.cs</DependentUpon>
     </EmbeddedResource>
@@ -377,6 +392,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="People\frmAddEditPerson.resx">
       <DependentUpon>frmAddEditPerson.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="People\frmFindPerson.resx">
+      <DependentUpon>frmFindPerson.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="People\frmPeople.resx">
       <DependentUpon>frmPeople.cs</DependentUpon>
