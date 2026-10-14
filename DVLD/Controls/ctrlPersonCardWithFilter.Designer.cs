@@ -103,7 +103,7 @@
             this.cbFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbFilter.FormattingEnabled = true;
             this.cbFilter.Items.AddRange(new object[] {
-            "PersonID",
+            "Person ID",
             "National Number"});
             this.cbFilter.Location = new System.Drawing.Point(168, 47);
             this.cbFilter.Name = "cbFilter";

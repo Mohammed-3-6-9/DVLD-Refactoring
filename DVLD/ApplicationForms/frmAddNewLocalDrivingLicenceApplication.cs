@@ -146,7 +146,7 @@ namespace DVLD.ApplicationForms
                 return false;
             }
 
-            byte PersonAge = ctrlPersonCard1.PersonAge;
+            int PersonAge = ctrlPersonCard1.Person.Age;
 
             if (PersonAge < clsLicenceClass.GetMinimumAllowedAge((int)cbLicenceClass.SelectedValue))
             {

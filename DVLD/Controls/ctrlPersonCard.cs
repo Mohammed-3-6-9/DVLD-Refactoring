@@ -17,17 +17,10 @@ namespace DVLD.Controls
     public partial class ctrlPersonCard : UserControl
     {
         private int _PersonID = -1;
+        public int PersonID { get => _PersonID; }
+
         private clsPerson _Person = new clsPerson();
-        public byte PersonAge
-        {
-            get
-            {
-                if (_Person == null) return 0;
-                byte age = (byte)(DateTime.Now.Year - _Person.DateOfBirth.Year);
-                if (_Person.DateOfBirth.Date > DateTime.Now.AddYears(-age)) age--;
-                return age;
-            }
-        }
+        public clsPerson Person {  get { return _Person; } }
 
         public ctrlPersonCard()
         {

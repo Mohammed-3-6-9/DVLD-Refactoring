@@ -14,21 +14,41 @@ namespace DVLD.Controls
 {
     public partial class ctrlPersonCardWithFilter : UserControl
     {
-        private int _PersonID { get; set; }
+        public event Action<int> OnPersonSelected;
 
-        public delegate void DataUpdated();
-        public event DataUpdated DataUpdatedEvent;
+        public int PersonID
+        {
+            get { return ctrlPersonCard1.PersonID; }
+        }
+
+        public clsPerson SelectedPerson { get => ctrlPersonCard1.Person; }
+
+        private bool _FilterEnabled = true;
+        public bool FilterEnabled
+        {
+            get => _FilterEnabled;
+            set => _FilterEnabled = gbFilter.Enabled = value;
+        }
+
+        private bool _ShowAddPerson = true;
+        public bool ShowAddPerson
+        {
+            get => _ShowAddPerson;
+            set => _ShowAddPerson = btnAddPerson.Visible = value;
+        }
 
         public ctrlPersonCardWithFilter()
         {
             InitializeComponent();
-            cbFilter.SelectedIndex = 0;
+            cbFilter.SelectedItem = "Person ID";
         }
 
         void IDSentBack(object sender, int PersonID)
         {
-            _PersonID = PersonID;
-            ctrlPersonCard1.FillCardWithData(_PersonID);
+            cbFilter.SelectedItem = "Person ID";
+            tbFilterValue.Text = PersonID.ToString();
+            ctrlPersonCard1.FillCardWithData(PersonID);
+            // OnPersonSelected?.Invoke(PersonID);
         }
 
         private void btnAddPerson_Click(object sender, EventArgs e)
@@ -42,34 +62,57 @@ namespace DVLD.Controls
         {
             if (string.IsNullOrWhiteSpace(tbFilterValue.Text))
             {
+                errorProvider1.SetError(tbFilterValue, "Please Insert a Value");
                 return;
             }
+            else
+                errorProvider1.SetError(tbFilterValue, string.Empty);
 
-            if (cbFilter.SelectedItem.ToString() == "PersonID")
+
+            if (cbFilter.SelectedItem.ToString() == "Person ID")
             {
-                _PersonID = int.Parse(tbFilterValue.Text);
-                _PersonID = ctrlPersonCard1.FillCardWithData(_PersonID);
+                if (!int.TryParse(tbFilterValue.Text, out int personID))
+                {
+                    errorProvider1.SetError(tbFilterValue, "Please Insert a Valid Value");
+                    return;
+                }
+                else
+                {
+                    ctrlPersonCard1.FillCardWithData(personID);
+                    errorProvider1.SetError(tbFilterValue, string.Empty);
+                }
             }
             else
             {
-                _PersonID = ctrlPersonCard1.FillCardWithData(tbFilterValue.Text);
+                ctrlPersonCard1.FillCardWithData(tbFilterValue.Text);
             }
+
+            // OnPersonSelected?.Invoke(ctrlPersonCard1.PersonID);
         }
 
         private void cbFilter_SelectedIndexChanged(object sender, EventArgs e)
         {
             tbFilterValue.Text = "";
+            tbFilterValue.Focus();
+            errorProvider1.SetError(tbFilterValue, string.Empty);
         }
 
         private void tbFilterValue_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (cbFilter.Text == "PersonID")
+            if (e.KeyChar == (char)13)
+            {
+                btnSearch.PerformClick();
+            }
+
+            if (cbFilter.Text == "Person ID")
             {
                 if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
                 {
-                    errorProvider1.SetError(((TextBox)sender), "Please Insert a Nuber");
+                    errorProvider1.SetError(((TextBox)sender), "Please Insert a Number");
                     e.Handled = true;
                 }
+                else
+                    errorProvider1.SetError((TextBox)sender, string.Empty);
             }
         }
     }

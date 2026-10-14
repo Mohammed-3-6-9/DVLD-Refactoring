@@ -26,9 +26,17 @@ namespace Business_Logic
         public string FullName
         {
             get { return FirstName + " " + SecondName + " " + ThirdName + " " + LastName; }
-
         }
         public DateTime DateOfBirth { get; set; }
+        public int Age
+        {
+            get
+            {
+                byte age = (byte)(DateTime.Now.Year - this.DateOfBirth.Year);
+                if (this.DateOfBirth.Date > DateTime.Now.AddYears(-age)) age--;
+                return age;
+            }
+        }
         public byte Gendor { get; set; }
         public string Address { get; set; }
         public string Phone { get; set; }
