@@ -48,7 +48,7 @@ namespace DVLD.Controls
             cbFilter.SelectedItem = "Person ID";
             tbFilterValue.Text = PersonID.ToString();
             ctrlPersonCard1.FillCardWithData(PersonID);
-            // OnPersonSelected?.Invoke(PersonID);
+            OnPersonSelected?.Invoke(PersonID);
         }
 
         private void btnAddPerson_Click(object sender, EventArgs e)
@@ -58,17 +58,8 @@ namespace DVLD.Controls
             frm.ShowDialog();
         }
 
-        private void btnSearch_Click(object sender, EventArgs e)
+        public void LoadPersonInfo()
         {
-            if (string.IsNullOrWhiteSpace(tbFilterValue.Text))
-            {
-                errorProvider1.SetError(tbFilterValue, "Please Insert a Value");
-                return;
-            }
-            else
-                errorProvider1.SetError(tbFilterValue, string.Empty);
-
-
             if (cbFilter.SelectedItem.ToString() == "Person ID")
             {
                 if (!int.TryParse(tbFilterValue.Text, out int personID))
@@ -86,8 +77,22 @@ namespace DVLD.Controls
             {
                 ctrlPersonCard1.FillCardWithData(tbFilterValue.Text);
             }
+        }
 
-            // OnPersonSelected?.Invoke(ctrlPersonCard1.PersonID);
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tbFilterValue.Text))
+            {
+                errorProvider1.SetError(tbFilterValue, "Please Insert a Value");
+                return;
+            }
+            else
+                errorProvider1.SetError(tbFilterValue, string.Empty);
+
+            LoadPersonInfo();
+
+            if (_FilterEnabled)
+                OnPersonSelected?.Invoke(ctrlPersonCard1.PersonID);
         }
 
         private void cbFilter_SelectedIndexChanged(object sender, EventArgs e)

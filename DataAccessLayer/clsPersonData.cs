@@ -342,15 +342,15 @@ namespace DataAccessLayer
         {
             bool Exists = false;
             SqlConnection Connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @"SELECT 1 FROM People Where NationalNumber = @NationalNumber";
+            string query = @"SELECT 1 FROM People Where NationalNo = @NationalNo";
             SqlCommand Command = new SqlCommand(query, Connection);
-            Command.Parameters.AddWithValue("@NationalNumber", NationalNumber);
+            Command.Parameters.AddWithValue("@NationalNo", NationalNumber);
 
             try
             {
                 Connection.Open();
                 object obj = Command.ExecuteScalar();
-                if (obj != null || obj != DBNull.Value)
+                if (obj != null && obj != DBNull.Value)
                     Exists = true;
             }
             catch

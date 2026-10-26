@@ -125,7 +125,6 @@
             this.llRemoveImage.TabIndex = 98;
             this.llRemoveImage.TabStop = true;
             this.llRemoveImage.Text = "Remove";
-            this.llRemoveImage.Visible = false;
             this.llRemoveImage.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llRemoveImage_LinkClicked);
             // 
             // llSetImage
@@ -197,7 +196,7 @@
             this.rbMale.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.rbMale.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.rbMale.UseVisualStyleBackColor = true;
-            this.rbMale.CheckedChanged += new System.EventHandler(this.rbMale_CheckedChanged);
+            this.rbMale.CheckedChanged += new System.EventHandler(this.rbMaleFemale_CheckedChanged);
             // 
             // rbFemale
             // 
@@ -214,6 +213,7 @@
             this.rbFemale.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.rbFemale.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.rbFemale.UseVisualStyleBackColor = true;
+            this.rbFemale.CheckedChanged += new System.EventHandler(this.rbMaleFemale_CheckedChanged);
             // 
             // label12
             // 

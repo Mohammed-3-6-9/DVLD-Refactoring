@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,7 +16,7 @@ namespace DVLD.People
 {
     public partial class frmAddEditPerson : Form
     {
-        enum enMode { AddNew=0,Update=1}
+        enum enMode { AddNew = 0, Update = 1}
         private enMode _Mode;
         private int _PersonID {  get; set; }
         private clsPerson _Person;
@@ -32,6 +33,7 @@ namespace DVLD.People
 
             _PersonID = PersonID;
             _Mode = enMode.Update;
+            // tbNationalNo.Enabled = false;
         }
 
         public frmAddEditPerson()
@@ -66,10 +68,13 @@ namespace DVLD.People
             rbFemale.Checked = !rbMale.Checked;
             cbCountry.SelectedValue = _Person.NationalCountryID;
 
-            if (string.IsNullOrEmpty(_Person.ImagePath))
+            if (string.IsNullOrWhiteSpace(_Person.ImagePath) || !File.Exists(_Person.ImagePath))
+            {
                 pbPersonImage.Image = (_Person.Gendor == 0) ? Properties.Resources.Male_512 : Properties.Resources.Female_512;
+                pbPersonImage.ImageLocation = "";
+            }
             else
-                pbPersonImage.Load(_Person.ImagePath);
+                pbPersonImage.ImageLocation = _Person.ImagePath;
         }
 
         void _PrepareCountiesList()
@@ -84,12 +89,13 @@ namespace DVLD.People
             _PrepareCountiesList();
 
             dtpDateOfBirth.Value = dtpDateOfBirth.MaxDate = DateTime.Now.AddYears(-18);
-            
+
             if (_Mode == enMode.Update)
             {
                 _FillFieldsByPersonData();
                 lblHeader.Text = "Update Person";
                 lblPersonID.Text = _PersonID.ToString();
+                // tbNationalNo.Enabled = false;
             }
             else
             {
@@ -105,25 +111,43 @@ namespace DVLD.People
 
         void _FillPersonWithData()
         {
-            _Person.FirstName = tbFirstName.Text;
-            _Person.SecondName = tbSecondName.Text;
-            _Person.ThirdName = tbThirdName.Text;
-            _Person.LastName = tbLastName.Text;
-            _Person.NationalNumber = tbNationalNo.Text;
-            _Person.Email = tbEmail.Text;
-            _Person.Address = tbAddress.Text;
+            _Person.FirstName = tbFirstName.Text.Trim();
+            _Person.SecondName = tbSecondName.Text.Trim();
+            _Person.ThirdName = tbThirdName.Text.Trim();
+            _Person.LastName = tbLastName.Text.Trim();
+            _Person.NationalNumber = tbNationalNo.Text.Trim();
+            _Person.Email = tbEmail.Text.Trim();
+            _Person.Address = tbAddress.Text.Trim();
             _Person.DateOfBirth = dtpDateOfBirth.Value;
-            _Person.Phone = tbPhone.Text;
+            _Person.Phone = tbPhone.Text.Trim();
             _Person.Gendor = (byte)((rbMale.Checked) ? 0 : 1);
             _Person.NationalCountryID = (int)cbCountry.SelectedValue;
 
             if (!string.IsNullOrEmpty(pbPersonImage.ImageLocation))
             {
-                _Person.ImagePath = pbPersonImage.ImageLocation;
+                _Person.ImagePath = pbPersonImage.ImageLocation.Trim();
                 llRemoveImage.Visible = true;
             }
             else
                 _Person.ImagePath = "";
+        }
+
+        private void _HandelAfterSave()
+        {
+            _Mode = enMode.Update;
+            lblHeader.Text = "Update Person";
+            _PersonID = _Person.PersonID;
+
+            if (!string.IsNullOrWhiteSpace(_Person.ImagePath) &&
+                _Person.ImagePath != pbPersonImage.ImageLocation)
+            {
+                pbPersonImage.ImageLocation = _Person.ImagePath;
+                llRemoveImage.Visible = true;
+            }
+
+            lblPersonID.Text = _PersonID.ToString();
+            SendIDBackEvent?.Invoke(this, _PersonID);
+            DataUpdatedEvent?.Invoke();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -136,12 +160,7 @@ namespace DVLD.People
             if (_Person.Save())
             {
                 MessageBox.Show("Person Saved Successfully", "Save Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                _Mode = enMode.Update;
-                lblHeader.Text = "Update Person";
-                _PersonID = _Person.PersonID;
-                lblPersonID.Text = _PersonID.ToString();
-                SendIDBackEvent?.Invoke(this, _PersonID);
-                DataUpdatedEvent?.Invoke();
+                _HandelAfterSave();
             }
             else
                 MessageBox.Show("Person Didn't Saved", "Save Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -155,7 +174,7 @@ namespace DVLD.People
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                pbPersonImage.Load(openFileDialog1.FileName);
+                pbPersonImage.ImageLocation = openFileDialog1.FileName;
                 llRemoveImage.Visible = true;
             }
         }
@@ -163,6 +182,8 @@ namespace DVLD.People
         private void llRemoveImage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             pbPersonImage.ImageLocation = null;
+            pbPersonImage.Image = (rbMale.Checked) ? Properties.Resources.Male_512 :
+                Properties.Resources.Female_512;
             llRemoveImage.Visible = false;
         }
 
@@ -183,12 +204,15 @@ namespace DVLD.People
 
         private void tbNationalNo_Validating(object sender, CancelEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbNationalNo.Text))
+            string nationalno = tbNationalNo.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(nationalno))
             {
                 e.Cancel = true;
                 errorProvider1.SetError(tbNationalNo, "Please Insert a Value");
             }
-            else if (_Mode == enMode.AddNew && clsPerson.IsPersonExist(tbNationalNo.Text))
+            else if (nationalno != _Person.NationalNumber.Trim() && 
+                clsPerson.IsPersonExist(nationalno))
             {
                 e.Cancel = true;
                 errorProvider1.SetError(tbNationalNo, "The National Number Is Already Used");
@@ -215,16 +239,18 @@ namespace DVLD.People
             else
             {
                 e.Cancel = false;
-                errorProvider1.SetError(tbNationalNo, "");
+                errorProvider1.SetError(tbEmail, "");
             }
 
         }
 
-        private void rbMale_CheckedChanged(object sender, EventArgs e)
+        private void rbMaleFemale_CheckedChanged(object sender, EventArgs e)
         {
-            if (pbPersonImage.Image == null)
+            if(string.IsNullOrWhiteSpace(pbPersonImage.ImageLocation))
+            {
                 pbPersonImage.Image = (rbMale.Checked) ? Properties.Resources.Male_512 :
                     Properties.Resources.Female_512;
+            }
         }
     }
 }

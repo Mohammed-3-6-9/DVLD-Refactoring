@@ -12,6 +12,8 @@ namespace DVLD.People
 {
     public partial class frmFindPerson : Form
     {
+        public event Action<int> OnPersonSelected;
+
         public frmFindPerson()
         {
             InitializeComponent();
@@ -20,6 +22,11 @@ namespace DVLD.People
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void ctrlPersonCardWithFilter1_OnPersonSelected(int obj)
+        {
+            OnPersonSelected?.Invoke(obj);
         }
     }
 }

@@ -19,6 +19,7 @@ namespace Business_Logic
         enMode _Mode = enMode.AddNew;
         public int PersonID { get; set; }
         public string NationalNumber { get; set; }
+        private string _NationalNo;
         public string FirstName { get; set; }
         public string SecondName { get; set; }
         public string ThirdName { get; set; }
@@ -32,7 +33,7 @@ namespace Business_Logic
         {
             get
             {
-                byte age = (byte)(DateTime.Now.Year - this.DateOfBirth.Year);
+                int age = DateTime.Now.Year - this.DateOfBirth.Year;
                 if (this.DateOfBirth.Date > DateTime.Now.AddYears(-age)) age--;
                 return age;
             }
@@ -45,8 +46,6 @@ namespace Business_Logic
         public clsCountry CountryInfo {  get; set; }
         public string ImagePath { get; set; }
         private string _OldImagePath { get; set; }
-
-        private string _DestinationFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PeopleImages");
 
         public clsPerson()
         {
@@ -63,7 +62,9 @@ namespace Business_Logic
             Email = "";
             NationalCountryID = 0;
             ImagePath = "";
-            _Mode=enMode.AddNew;
+            _OldImagePath = "";
+            _NationalNo = "";
+            _Mode =enMode.AddNew;
         }
 
         private clsPerson(int ID, string NationalNumber, string FirstName,
@@ -73,6 +74,7 @@ namespace Business_Logic
         {
             this.PersonID = ID;
             this.NationalNumber = NationalNumber;
+            this._NationalNo = NationalNumber;
             this.FirstName = FirstName;
             this.SecondName = SecondName;
             this.ThirdName = ThirdName;
@@ -156,11 +158,13 @@ namespace Business_Logic
 
         private bool _IsValidNationalNo()
         {
-            if (string.IsNullOrWhiteSpace(this.NationalNumber))
+            string nationalno = this.NationalNumber.Trim();
+
+            if (string.IsNullOrWhiteSpace(nationalno))
             {
                 return false;
             }
-            else if ((_Mode == enMode.AddNew) && IsPersonExist(this.NationalNumber))
+            else if (nationalno != _NationalNo.Trim() && IsPersonExist(nationalno))
             {
                 return false;
             }
@@ -168,41 +172,70 @@ namespace Business_Logic
             return true;
         }
 
-        bool _UpdatePersonImage()
+        bool _UndoUpdatePersonImage()
         {
-            if (string.IsNullOrWhiteSpace(this.ImagePath))
-            {
-                if (!string.IsNullOrWhiteSpace(this._OldImagePath))
-                    System.IO.File.Delete(this._OldImagePath);
-
-                this.ImagePath = "";
-                return true;
-            }
+            bool undo = false;
 
             if (this._OldImagePath != this.ImagePath)
             {
-                string SourceFile = this.ImagePath;
-
-                if(!System.IO.Directory.Exists(this._DestinationFolder))
-                    System.IO.Directory.CreateDirectory(this._DestinationFolder);
-
-                string NewFileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(SourceFile);
-                string DestinationFile = System.IO.Path.Combine(_DestinationFolder, NewFileName);
-
                 try
                 {
-                    System.IO.File.Copy(SourceFile, DestinationFile, true);
+                    if (!string.IsNullOrWhiteSpace(this.ImagePath))
+                        System.IO.File.Delete(this.ImagePath);
 
+                    this.ImagePath = _OldImagePath;
+                    undo = true;
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    undo = false;
+                }
+            }
+
+            return undo;
+        }
+
+        bool _FinishUpdatePersonImage()
+        {
+            bool finish = false;
+
+            if (this._OldImagePath != this.ImagePath)
+            {
+                try
+                {
                     if (!string.IsNullOrWhiteSpace(this._OldImagePath))
-                        System.IO.File.Delete(this._OldImagePath);
+                        System.IO.File.Delete(this._OldImagePath.Trim());
 
-                    this.ImagePath = DestinationFile;
                     this._OldImagePath = ImagePath;
+                    finish = true;
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    finish = false;
+                }
+            }
+
+            return finish;
+        }
+
+        bool _UpdatePersonImage()
+        {
+            if (this._OldImagePath != this.ImagePath)
+            {
+                if (string.IsNullOrWhiteSpace(this.ImagePath))
+                {
+                    this.ImagePath = "";
                     return true;
                 }
-                catch
+                else
                 {
-                    return false;
+                    string NewFileName = this.ImagePath;
+                    if (!clsUtil.CopyImageToProjectImagesFolder(ref NewFileName))
+                        return false;
+
+                    this.ImagePath = NewFileName;
                 }
             }
 
@@ -240,7 +273,7 @@ namespace Business_Logic
 
             return true;
         }
-
+        
         public bool Save()
         {
             if (!_ValidateProberties())
@@ -256,16 +289,27 @@ namespace Business_Logic
                         if (_AddNew())
                         {
                             _Mode = enMode.Update;
-                            return true;
+                            _FinishUpdatePersonImage();
                         }
                         else
                         {
+                            _UndoUpdatePersonImage();
                             return false;
                         }
+                        
+                        return true;
                     }
                 case enMode.Update:
                     {
-                        return _Update();
+                        if (_Update())
+                            _FinishUpdatePersonImage();
+                        else
+                        {
+                            _UndoUpdatePersonImage();
+                            return false;
+                        }
+
+                        return true;
                     }
             }
 

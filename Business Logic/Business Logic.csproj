@@ -57,6 +57,7 @@
     <Compile Include="clsPerson.cs" />
     <Compile Include="clsSessionInfo.cs" />
     <Compile Include="clsUser.cs" />
+    <Compile Include="clsUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
