@@ -47,8 +47,8 @@ namespace DVLD.Controls
         {
             cbFilter.SelectedItem = "Person ID";
             tbFilterValue.Text = PersonID.ToString();
-            ctrlPersonCard1.FillCardWithData(PersonID);
-            OnPersonSelected?.Invoke(PersonID);
+            int result = ctrlPersonCard1.FillCardWithData(PersonID);
+            OnPersonSelected?.Invoke(result);
         }
 
         private void btnAddPerson_Click(object sender, EventArgs e)
@@ -58,8 +58,17 @@ namespace DVLD.Controls
             frm.ShowDialog();
         }
 
-        public void LoadPersonInfo()
+        private void FindPersonInfo()
         {
+            if (string.IsNullOrWhiteSpace(tbFilterValue.Text))
+            {
+                errorProvider1.SetError(tbFilterValue, "Please Insert a Value");
+                return;
+            }
+            else
+                errorProvider1.SetError(tbFilterValue, string.Empty);
+
+
             if (cbFilter.SelectedItem.ToString() == "Person ID")
             {
                 if (!int.TryParse(tbFilterValue.Text, out int personID))
@@ -77,22 +86,21 @@ namespace DVLD.Controls
             {
                 ctrlPersonCard1.FillCardWithData(tbFilterValue.Text);
             }
+
+            if (_FilterEnabled)
+                OnPersonSelected?.Invoke(ctrlPersonCard1.PersonID);
+        }
+
+        public void FindPersonInfo(int PersonID)
+        {
+            cbFilter.SelectedIndex = 0;
+            tbFilterValue.Text = PersonID.ToString();
+            FindPersonInfo();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbFilterValue.Text))
-            {
-                errorProvider1.SetError(tbFilterValue, "Please Insert a Value");
-                return;
-            }
-            else
-                errorProvider1.SetError(tbFilterValue, string.Empty);
-
-            LoadPersonInfo();
-
-            if (_FilterEnabled)
-                OnPersonSelected?.Invoke(ctrlPersonCard1.PersonID);
+            FindPersonInfo();
         }
 
         private void cbFilter_SelectedIndexChanged(object sender, EventArgs e)

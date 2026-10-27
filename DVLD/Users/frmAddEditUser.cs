@@ -59,8 +59,6 @@ namespace DVLD.Users
                 return;
             }
 
-            ctrlPersonCard1.FillCardWithData(_PersonID);
-
             lblUserID.Text = _UserID.ToString();
             tbUserName.Text = _User.UserName;
             tbPassword.Text = _User.Password;
@@ -71,12 +69,11 @@ namespace DVLD.Users
 
         private void frmAddEditUser_Load(object sender, EventArgs e)
         {
-            cbFilter.SelectedIndex = 0;
-
             if (_Mode == enMode.Update)
             {
                 _FillFieldsByUserData();
-                gbFilter.Enabled = false;
+                ctrlPersonCardWithFilter1.FilterEnabled = false;
+                ctrlPersonCardWithFilter1.FindPersonInfo(_PersonID);
                 lblHeader.Text = "Update User";
             }
             else
@@ -93,68 +90,6 @@ namespace DVLD.Users
             _User.PersonID = _PersonID;
             _User.IsActive = chkIsActive.Checked;
             _User.Password = tbPassword.Text;
-        }
-
-        void IDSentBack(object sender, int PersonID)
-        {
-            _PersonID = PersonID;
-            ctrlPersonCard1.FillCardWithData(_PersonID);
-        }
-
-        private void btnAddPerson_Click(object sender, EventArgs e)
-        {
-            frmAddEditPerson frm = new frmAddEditPerson();
-            frm.SendIDBackEvent += IDSentBack;
-            frm.ShowDialog();
-        }
-
-        private void btnSearch_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(tbFilterValue.Text))
-            {
-                return;
-            }
-
-            if (_Mode == enMode.AddNew)
-            {
-                _PersonID = -1;
-            }
-
-            if (cbFilter.SelectedItem.ToString()=="PersonID")
-            {
-                if (!int.TryParse(tbFilterValue.Text, out int personID))
-                {
-                    MessageBox.Show("Please enter a valid PersonID.");
-                    return;
-                }
-
-                if (clsUser.IsUserExistByPersonID(personID))
-                {
-                    MessageBox.Show("Person is Already a User", "Ops",
-                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return;
-                }
-
-                _PersonID = ctrlPersonCard1.FillCardWithData(personID);
-            }
-            else
-            {
-                string nationalno = tbFilterValue.Text.Trim();
-
-                if (clsUser.IsUserExistByNationalNumber(nationalno))
-                {
-                    MessageBox.Show("Person is Already a User", "Ops",
-                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return;
-                }
-
-                _PersonID = ctrlPersonCard1.FillCardWithData(nationalno);
-            }
-        }
-
-        private void cbFilter_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            tbFilterValue.Text = "";
         }
 
         private bool _Validation()
@@ -206,7 +141,7 @@ namespace DVLD.Users
         {
             tbPassword.Enabled = tbConfirmPassword.Enabled = false;
             btnChangePassword.Enabled = true;
-            gbFilter.Enabled = false;
+            ctrlPersonCardWithFilter1.FilterEnabled = false;
             lblHeader.Text = "Update User";
         }
 
@@ -266,24 +201,27 @@ namespace DVLD.Users
             }
         }
 
-        private void tbFilterValue_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (cbFilter.Text == "PersonID")
-            {
-                if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-                {
-                    errorProvider1.SetError(tbFilterValue, "Please Insert a Nuber");
-                    e.Handled = true;
-                }
-                else
-                    errorProvider1.SetError(tbFilterValue, "");
-            }
-        }
-
         private void btnChangePassword_Click(object sender, EventArgs e)
         {
             frmChangePassword frm = new frmChangePassword(_UserID);
             frm.ShowDialog();
+        }
+
+        private void ctrlPersonCardWithFilter1_OnPersonSelected(int obj)
+        {
+            _PersonID = obj;
+
+            if (_PersonID == -1)
+                return;
+
+            if (clsUser.IsUserExistByPersonID(_PersonID))
+            {
+                _PersonID = -1;
+
+                MessageBox.Show("Person is Already a User", "Ops",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
         }
     }
 }
