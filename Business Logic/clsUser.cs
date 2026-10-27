@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -16,17 +17,13 @@ namespace Business_Logic
         enMode _Mode = enMode.AddNew;
         public int UserID { get; set; }
         public int PersonID { get; set; }
-        public string FullName { get; set; }
+        public clsPerson PersonInfo;
 
         private string _UserName;
         public string UserName
         {
             get => _UserName;
-            set
-            {
-                _PrevUserName = _UserName;
-                _UserName = value;
-            }
+            set => _UserName = value;
         }
         private string _PrevUserName { get; set; }
         public bool IsActive { get; set; }
@@ -36,9 +33,9 @@ namespace Business_Logic
         {
             PersonID = -1;
             UserID = -1;
-            FullName = "";
             IsActive = false;
             _UserName = "";
+            _PrevUserName = "";
             Password = "";
             _Mode = enMode.AddNew;
         }
@@ -48,28 +45,26 @@ namespace Business_Logic
         {
 
             this.PersonID =PersonID;
+            this.PersonInfo = clsPerson.Find(PersonID);
             this.UserID = UserID;
             this.Password = DecryptPassword(Password);
             this.IsActive = IsActive;
             this.UserName = UserName;
+            this._PrevUserName = this.UserName;
             _Mode = enMode.Update;
         }
 
         private bool _AddNew()
         {
-            this.Password=EncryptPassword(this.Password);
-
-            this.UserID = clsUsersData.AddNewUser(PersonID,UserName,Password,IsActive);
+            this.UserID = clsUsersData.AddNewUser(PersonID,UserName, EncryptPassword(this.Password), IsActive);
 
             return (this.UserID != -1);
         }
 
         private bool _Update()
         {
-            this.Password = EncryptPassword(this.Password);
-
             return clsUsersData.UpdateUser(this.UserID, this.PersonID, this.UserName,
-                this.Password, this.IsActive);
+                EncryptPassword(this.Password), this.IsActive);
         }
 
         public static clsUser Find(int ID)
@@ -110,22 +105,9 @@ namespace Business_Logic
                 return false;
             }
 
-            if (this._Mode == enMode.AddNew)
+            if (_UserName != _PrevUserName && clsUser.IsUserNameExist(_UserName))
             {
-                if (IsUserNameExist(this.UserName))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (_UserName != _PrevUserName)
-                {
-                    if (clsUser.IsUserNameExist(_UserName))
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
 
             return true;
@@ -143,6 +125,7 @@ namespace Business_Logic
                         if (_AddNew())
                         {
                             _Mode = enMode.Update;
+                            _PrevUserName = _UserName;
                             return true;
                         }
                         else
@@ -152,7 +135,13 @@ namespace Business_Logic
                     }
                 case enMode.Update:
                     {
-                        return _Update();
+                        if (_Update())
+                        {
+                            _PrevUserName = _UserName;
+                            return true;
+                        }
+                        else
+                            return false;
                     }
             }
 
@@ -174,8 +163,20 @@ namespace Business_Logic
             return clsUsersData.IsUserExist(UserID);
         }
 
+        private bool _ChangePassword()
+        {
+            return clsUsersData.ChangePassword(this.UserID, EncryptPassword(this.Password));
+        }
+
+
         public static bool ChangePassword(int UserID,string OldPassword,string NewPassword)
         {
+            if (string.IsNullOrWhiteSpace(NewPassword) ||
+                string.IsNullOrWhiteSpace(OldPassword))
+            {
+                return false;
+            }
+
             clsUser user = clsUser.Find(UserID);
 
             if (user == null)
@@ -184,7 +185,7 @@ namespace Business_Logic
             if(user.Password == OldPassword)
             {
                 user.Password = NewPassword;
-                return user._Update();
+                return user._ChangePassword();
             }
 
             return false;

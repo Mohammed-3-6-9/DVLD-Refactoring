@@ -33,6 +33,8 @@ namespace DataAccessLayer
                     Password = reader["Password"].ToString();
                     IsActive = (bool)reader["IsActive"];
                 }
+                else
+                    IsFound = false;
 
                 reader.Close();
             }
@@ -71,8 +73,9 @@ namespace DataAccessLayer
                 if (objID != null && int.TryParse(objID.ToString(), out int ID))
                     UserID = ID;
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 UserID = -1;
             }
             finally
@@ -104,8 +107,9 @@ namespace DataAccessLayer
                 Connection.Open();
                 RowsEffected = Command.ExecuteNonQuery();
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 return false;
             }
             finally
@@ -133,8 +137,9 @@ namespace DataAccessLayer
 
                 reader.Close();
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
             }
             finally
             {
@@ -157,8 +162,9 @@ namespace DataAccessLayer
                 Connection.Open();
                 RowsAffected = Command.ExecuteNonQuery();
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 return false;
             }
             finally
@@ -185,8 +191,9 @@ namespace DataAccessLayer
                 if (obj != null)
                     Exists = true;
             }
-            catch
+            catch( Exception ex )
             {
+                Console.WriteLine("Error: " + ex.Message);
                 Exists = false;
             }
             finally
@@ -213,8 +220,9 @@ namespace DataAccessLayer
                 if (obj != null)
                     Exists = true;
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 Exists = false;
             }
             finally
@@ -250,11 +258,14 @@ namespace DataAccessLayer
                     Password = reader["Password"].ToString();
                     IsActive = (bool)reader["IsActive"];
                 }
+                else
+                    IsFound = false;
 
                 reader.Close();
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 IsFound = false;
             }
             finally
@@ -280,8 +291,9 @@ namespace DataAccessLayer
                 if (obj != null)
                     Exists = true;
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("Error : " + ex.ToString());
                 Exists = false;
             }
             finally
@@ -317,6 +329,35 @@ namespace DataAccessLayer
             }
 
             return Exists;
+        }
+
+        public static bool ChangePassword(int UserID, string Password)
+        {
+            int RowsEffected = 0;
+            SqlConnection Connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+            string query = @"UPDATE Users SET Password = @Password,
+               WHERE UserID = @UserID;";
+
+            SqlCommand Command = new SqlCommand(query, Connection);
+            Command.Parameters.AddWithValue("@UserID", UserID);
+            Command.Parameters.AddWithValue("@Password", Password);
+
+            try
+            {
+                Connection.Open();
+                RowsEffected = Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                Connection.Close();
+            }
+
+            return (RowsEffected > 0);
         }
     }
 }
