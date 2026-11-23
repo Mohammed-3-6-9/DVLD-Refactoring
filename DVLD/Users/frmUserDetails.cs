@@ -27,17 +27,7 @@ namespace DVLD.Users
 
         private void frmUserDetails_Load(object sender, EventArgs e)
         {
-            clsUser User = clsUser.Find(_UserID);
-
-            if (User == null)
-            {
-                MessageBox.Show($"Couldn't Find User [ {_UserID} ]");
-                this.Close();
-                return;
-            }
-
-            ctrlPersonCard1.FillCardWithData(User.PersonID);
-            ctrlLoginInformation1.FillCardWithData(User.UserID);
+            ctrlUserCard1.FillCardWithData(_UserID);
         }
     }
 }

@@ -31,8 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmUserDetails));
             this.label1 = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.ctrlLoginInformation1 = new DVLD.Controls.ctrlLoginInformation();
-            this.ctrlPersonCard1 = new DVLD.Controls.ctrlPersonCard();
             this.SuspendLayout();
             // 
             // label1
@@ -53,7 +51,7 @@
             this.btnClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.btnClose.Image = ((System.Drawing.Image)(resources.GetObject("btnClose.Image")));
             this.btnClose.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnClose.Location = new System.Drawing.Point(1026, 609);
+            this.btnClose.Location = new System.Drawing.Point(1023, 578);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(146, 46);
             this.btnClose.TabIndex = 16;
@@ -63,29 +61,21 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click_1);
             // 
-            // ctrlLoginInformation1
+            // ctrlUserCard1
             // 
-            this.ctrlLoginInformation1.Location = new System.Drawing.Point(12, 480);
-            this.ctrlLoginInformation1.Name = "ctrlLoginInformation1";
-            this.ctrlLoginInformation1.Size = new System.Drawing.Size(1160, 111);
-            this.ctrlLoginInformation1.TabIndex = 15;
-            // 
-            // ctrlPersonCard1
-            // 
-            this.ctrlPersonCard1.Location = new System.Drawing.Point(12, 95);
-            this.ctrlPersonCard1.Name = "ctrlPersonCard1";
-            this.ctrlPersonCard1.Size = new System.Drawing.Size(1160, 360);
-            this.ctrlPersonCard1.TabIndex = 0;
+            this.ctrlUserCard1.Location = new System.Drawing.Point(12, 75);
+            this.ctrlUserCard1.Name = "ctrlUserCard1";
+            this.ctrlUserCard1.Size = new System.Drawing.Size(1164, 485);
+            this.ctrlUserCard1.TabIndex = 17;
             // 
             // frmUserDetails
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1181, 681);
+            this.ClientSize = new System.Drawing.Size(1181, 645);
+            this.Controls.Add(this.ctrlUserCard1);
             this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.ctrlLoginInformation1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.ctrlPersonCard1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "frmUserDetails";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -97,10 +87,8 @@
         }
 
         #endregion
-
-        private Controls.ctrlPersonCard ctrlPersonCard1;
         private System.Windows.Forms.Label label1;
-        private Controls.ctrlLoginInformation ctrlLoginInformation1;
         private System.Windows.Forms.Button btnClose;
+        private ctrlUserCard ctrlUserCard1;
     }
 }
