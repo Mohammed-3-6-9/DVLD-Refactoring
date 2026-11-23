@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAddEditUser));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tbPersonInfo = new System.Windows.Forms.TabPage();
+            this.ctrlPersonCardWithFilter1 = new DVLD.Controls.ctrlPersonCardWithFilter();
             this.button1 = new System.Windows.Forms.Button();
             this.tbLoginInfo = new System.Windows.Forms.TabPage();
             this.btnChangePassword = new System.Windows.Forms.Button();
@@ -48,7 +49,6 @@
             this.btnClose = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
-            this.ctrlPersonCardWithFilter1 = new DVLD.Controls.ctrlPersonCardWithFilter();
             this.tabControl1.SuspendLayout();
             this.tbPersonInfo.SuspendLayout();
             this.tbLoginInfo.SuspendLayout();
@@ -78,6 +78,16 @@
             this.tbPersonInfo.TabIndex = 0;
             this.tbPersonInfo.Text = "Person Info";
             this.tbPersonInfo.UseVisualStyleBackColor = true;
+            // 
+            // ctrlPersonCardWithFilter1
+            // 
+            this.ctrlPersonCardWithFilter1.FilterEnabled = true;
+            this.ctrlPersonCardWithFilter1.Location = new System.Drawing.Point(11, 33);
+            this.ctrlPersonCardWithFilter1.Name = "ctrlPersonCardWithFilter1";
+            this.ctrlPersonCardWithFilter1.ShowAddPerson = true;
+            this.ctrlPersonCardWithFilter1.Size = new System.Drawing.Size(1167, 481);
+            this.ctrlPersonCardWithFilter1.TabIndex = 100;
+            this.ctrlPersonCardWithFilter1.OnPersonSelected += new System.Action<int>(this.ctrlPersonCardWithFilter1_OnPersonSelected);
             // 
             // button1
             // 
@@ -186,7 +196,7 @@
             this.tbConfirmPassword.Size = new System.Drawing.Size(191, 35);
             this.tbConfirmPassword.TabIndex = 8;
             this.tbConfirmPassword.UseSystemPasswordChar = true;
-            this.tbConfirmPassword.Validating += new System.ComponentModel.CancelEventHandler(this.tbConfirmPassword_Validating);
+            this.tbConfirmPassword.TextChanged += new System.EventHandler(this.tbConfirmPassword_TextChanged);
             // 
             // tbPassword
             // 
@@ -270,16 +280,6 @@
             // errorProvider1
             // 
             this.errorProvider1.ContainerControl = this;
-            // 
-            // ctrlPersonCardWithFilter1
-            // 
-            this.ctrlPersonCardWithFilter1.FilterEnabled = true;
-            this.ctrlPersonCardWithFilter1.Location = new System.Drawing.Point(11, 33);
-            this.ctrlPersonCardWithFilter1.Name = "ctrlPersonCardWithFilter1";
-            this.ctrlPersonCardWithFilter1.ShowAddPerson = true;
-            this.ctrlPersonCardWithFilter1.Size = new System.Drawing.Size(1167, 481);
-            this.ctrlPersonCardWithFilter1.TabIndex = 100;
-            this.ctrlPersonCardWithFilter1.OnPersonSelected += new System.Action<int>(this.ctrlPersonCardWithFilter1_OnPersonSelected);
             // 
             // frmAddEditUser
             // 

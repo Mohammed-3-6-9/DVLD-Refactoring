@@ -159,8 +159,7 @@ namespace DVLD
 
         private void editToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            frmAddEditUser frm = new frmAddEditUser((int)dgvUsers.CurrentRow.Cells["UserID"].Value,
-                (int)dgvUsers.CurrentRow.Cells["PersonID"].Value);
+            frmAddEditUser frm = new frmAddEditUser((int)dgvUsers.CurrentRow.Cells["UserID"].Value);
             frm.DataUpdatedEvent += DataUpdated;
             frm.ShowDialog();
         }
