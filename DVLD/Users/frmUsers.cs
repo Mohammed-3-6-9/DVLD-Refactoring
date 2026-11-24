@@ -29,14 +29,12 @@ namespace DVLD
 
             _DataView = dt.DefaultView;
             dgvUsers.DataSource = _DataView;
+            cbFiltersType.SelectedIndex = 0;
 
             lblRecordsNumber.Text = dgvUsers.RowCount.ToString();
         }
         private void frmUsers_Load(object sender, EventArgs e)
         {
-            cbFiltersType.SelectedIndex = 0;
-            tbFilterValue.Visible = false;
-            cbIsActive.Visible = false;
             _RefreshUsers();
         }
 
@@ -53,7 +51,7 @@ namespace DVLD
 
         private void tbFilterValue_TextChanged(object sender, EventArgs e)
         {
-            if(string.IsNullOrWhiteSpace(tbFilterValue.Text))
+            if(cbFiltersType.Text == "None" || string.IsNullOrWhiteSpace(tbFilterValue.Text))
             {
                 _DataView.RowFilter = null;
                 lblRecordsNumber.Text=dgvUsers.RowCount.ToString();
@@ -62,10 +60,7 @@ namespace DVLD
 
             if (cbFiltersType.Text == "PersonID" || cbFiltersType.Text == "UserID")
             {
-                if (!string.IsNullOrWhiteSpace(tbFilterValue.Text))
-                    _DataView.RowFilter = $"{cbFiltersType.Text} = {tbFilterValue.Text}";
-                else
-                    _DataView.RowFilter = null;
+                _DataView.RowFilter = $"{cbFiltersType.Text} = {tbFilterValue.Text}";
             }
             else
             {
@@ -78,34 +73,26 @@ namespace DVLD
 
         private void cbFiltersType_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            if (cbFiltersType.Text == "None")
-            {
-                tbFilterValue.Visible = false;
-                cbIsActive.Visible = false;
-            }
-            else if (cbFiltersType.Text == "IsActive")
+            if (cbFiltersType.Text == "IsActive")
             {
                 cbIsActive.Visible = true;
                 tbFilterValue.Visible = false;
+                cbIsActive.SelectedIndex = 0;
+                cbIsActive.Focus();
             }
             else
             {
+                tbFilterValue.Visible = (cbFiltersType.Text != "None");
                 cbIsActive.Visible = false;
-                tbFilterValue.Visible = true;
+                tbFilterValue.Text = "";
+                tbFilterValue.Focus();
             }
-
-            tbFilterValue.Text = "";
         }
 
         private void tbFilterValue_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (cbFiltersType.Text == "PersonID" || cbFiltersType.Text == "UserID")
-            {
-                if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-                {
-                    e.Handled = true;
-                }
-            }
+                e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
         }
 
         void _MessageFeatureNotImplemented()
@@ -166,10 +153,11 @@ namespace DVLD
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show($"Are you sure you want to delete User [ {dgvUsers.CurrentRow.Cells["UserID"].Value} ]",
+            int UserID = int.Parse(dgvUsers.CurrentRow.Cells["UserID"].Value.ToString());
+            if (MessageBox.Show($"Are you sure you want to delete User [ {UserID.ToString()} ]",
                 "Confirm Delete", MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
-                if (clsUser.DeleteUser(int.Parse(dgvUsers.CurrentRow.Cells["UserID"].Value.ToString())))
+                if (clsUser.DeleteUser(UserID))
                 {
                     MessageBox.Show("User Deleted Successfully");
                     _RefreshUsers();
