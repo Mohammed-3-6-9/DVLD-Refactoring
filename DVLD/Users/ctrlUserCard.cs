@@ -17,12 +17,12 @@ namespace DVLD.Users
         private clsUser _User;
         public int UserID { get => _UserID; }
 
-        private ctrlUserCard()
+        public ctrlUserCard()
         {
             InitializeComponent();
         }
 
-        public void FillCardWithData(int UserID)
+        public bool FillCardWithData(int UserID)
         {
             _UserID = UserID;
             _User = clsUser.Find(_UserID);
@@ -31,10 +31,11 @@ namespace DVLD.Users
             {
                 MessageBox.Show($"Couldn't Find User [ {_UserID} ]");
                 _ResetInfo();
-                return;
+                return false;
             }
 
             _FillUserCard();
+            return true;
         }
 
         private void _ResetInfo()

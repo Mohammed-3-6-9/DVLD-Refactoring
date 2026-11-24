@@ -13,6 +13,15 @@ namespace Business_Logic
 {
     public class clsUser
     {
+        public enum enChangePasswordResult
+        {
+            Success=0,
+            EmptyFields=1,
+            UserNotFound=2,
+            WrongOldPassword=3,
+            DatabaseError=4
+        }
+
         public enum enMode { AddNew = 0, Update = 1 }
         enMode _Mode = enMode.AddNew;
         public int UserID { get; set; }
@@ -169,26 +178,29 @@ namespace Business_Logic
         }
 
 
-        public static bool ChangePassword(int UserID,string OldPassword,string NewPassword)
+        public static enChangePasswordResult ChangePassword(int UserID,string OldPassword,string NewPassword)
         {
             if (string.IsNullOrWhiteSpace(NewPassword) ||
                 string.IsNullOrWhiteSpace(OldPassword))
             {
-                return false;
+                return enChangePasswordResult.EmptyFields;
             }
 
             clsUser user = clsUser.Find(UserID);
 
             if (user == null)
-                return false;
+                return enChangePasswordResult.UserNotFound;
 
-            if(user.Password == OldPassword)
+            if (user.Password == OldPassword)
             {
                 user.Password = NewPassword;
-                return user._ChangePassword();
+                if (user._ChangePassword())
+                    return enChangePasswordResult.Success;
+                else
+                    return enChangePasswordResult.DatabaseError;
             }
-
-            return false;
+            else
+                return enChangePasswordResult.WrongOldPassword;
         }
 
         public static bool IsUserNameExist(string UserName)

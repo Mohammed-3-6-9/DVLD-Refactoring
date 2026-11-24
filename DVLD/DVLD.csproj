@@ -139,12 +139,6 @@
     <Compile Include="Controls\ctrlInternationalDriverInfo.Designer.cs">
       <DependentUpon>ctrlInternationalDriverInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ctrlLoginInformation.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\ctrlLoginInformation.Designer.cs">
-      <DependentUpon>ctrlLoginInformation.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\ctrlPersonCard.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -353,9 +347,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ctrlInternationalDriverInfo.resx">
       <DependentUpon>ctrlInternationalDriverInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ctrlLoginInformation.resx">
-      <DependentUpon>ctrlLoginInformation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ctrlPersonCard.resx">
       <DependentUpon>ctrlPersonCard.cs</DependentUpon>
