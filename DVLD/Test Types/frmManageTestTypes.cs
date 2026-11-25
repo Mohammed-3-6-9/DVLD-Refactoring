@@ -47,7 +47,7 @@ namespace DVLD.Test_Types
 
         private void editTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmUpdateTestType frm = new frmUpdateTestType((int)dgvTestTypes.CurrentRow.Cells["TestTypeID"].Value);
+            frmUpdateTestType frm = new frmUpdateTestType((clsGeneral.enTestTypes)dgvTestTypes.CurrentRow.Cells["TestTypeID"].Value);
             frm.DataUpdatedEvent += DataUpdated;
             frm.ShowDialog();
         }

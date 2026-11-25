@@ -10,20 +10,20 @@ namespace Business_Logic
 {
     public class clsTestType
     {
-        public int TestTypeID { get; set; }
+        public clsGeneral.enTestTypes TestTypeID { get; set; }
         public string TestTypeTitle { get; set; }
         public string TestTypeDescription { get; set; }
         public decimal TestTypeFees { get; set; }
 
         public clsTestType()
         {
-            TestTypeID = -1;
+            TestTypeID = clsGeneral.enTestTypes.Vision;
             TestTypeTitle = "";
             TestTypeDescription = "";
             TestTypeFees = 0;
         }
 
-        private clsTestType(int TestTypeID, string TestTypeTitle, string TestTypeDescription, decimal TestTypeFees)
+        private clsTestType(clsGeneral.enTestTypes TestTypeID, string TestTypeTitle, string TestTypeDescription, decimal TestTypeFees)
         {
             this.TestTypeID = TestTypeID;
             this.TestTypeTitle = TestTypeTitle;
@@ -33,16 +33,16 @@ namespace Business_Logic
 
         private bool _Update()
         {
-            return clsTestTypesData.UpdateTestType(this.TestTypeID,this.TestTypeTitle,
+            return clsTestTypesData.UpdateTestType((int)this.TestTypeID,this.TestTypeTitle,
                 this.TestTypeDescription, this.TestTypeFees);
         }
 
-        public static clsTestType Find(int TestTypeID)
+        public static clsTestType Find(clsGeneral.enTestTypes TestTypeID)
         {
             string TestTypeTitle = "", TestTypeDescription = ";";
             decimal TestFees = 0;
 
-            if (clsTestTypesData.GetTestTypeInfo(TestTypeID, ref TestTypeTitle, ref TestTypeDescription, ref TestFees))
+            if (clsTestTypesData.GetTestTypeInfo((int)TestTypeID, ref TestTypeTitle, ref TestTypeDescription, ref TestFees))
             {
                 return new clsTestType(TestTypeID, TestTypeTitle, TestTypeDescription, TestFees);
             }

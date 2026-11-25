@@ -13,14 +13,14 @@ namespace DVLD.Test_Types
 {
     public partial class frmUpdateTestType : Form
     {
-        private int _TestTypeID { get; set; }
+        private clsGeneral.enTestTypes _TestTypeID { get; set; }
 
         private clsTestType _TestType;
 
         public delegate void DataUpdated();
         public event DataUpdated DataUpdatedEvent;
 
-        public frmUpdateTestType(int TestTypeID)
+        public frmUpdateTestType(clsGeneral.enTestTypes TestTypeID)
         {
             InitializeComponent();
 
