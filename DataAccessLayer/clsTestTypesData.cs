@@ -28,7 +28,6 @@ namespace DataAccessLayer
                 {
                     IsFound = true;
 
-                    TestTypeID = (int)reader["TestTypeID"];
                     TestTypeTitle = reader["TestTypeTitle"].ToString();
                     TestTypeDescription = reader["TestTypeDescription"].ToString();
                     TestTypeFees = Convert.ToDecimal(reader["TestTypeFees"]);
@@ -47,7 +46,6 @@ namespace DataAccessLayer
 
             return IsFound;
         }
-
 
         public static bool UpdateTestType(int TestTypeID, string TestTypeTitle,
             string TestTypeDescription, decimal TestTypeFees)

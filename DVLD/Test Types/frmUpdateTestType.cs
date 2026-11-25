@@ -72,6 +72,8 @@ namespace DVLD.Test_Types
 
                 DataUpdatedEvent?.Invoke();
             }
+            else
+                MessageBox.Show("Error: Data Is not Saved Successfully.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -86,7 +88,7 @@ namespace DVLD.Test_Types
                 e.Cancel = true;
                 errorProvider1.SetError(tbFees, "Please Insert a Value");
             }
-            else if (!double.TryParse(tbFees.Text, out _))
+            else if (!decimal.TryParse(tbFees.Text, out _))
             {
                 e.Cancel = true;
                 errorProvider1.SetError(tbFees, "Please Insert a Valid Value");
