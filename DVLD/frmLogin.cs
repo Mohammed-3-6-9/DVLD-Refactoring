@@ -5,22 +5,19 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace DVLD
 {
     public partial class frmLogin : Form
     {
-        enum enMode {Read=0,Write=1}
-
-        private short NumOfTries = 0;
-
         private string _DestinationFile = Path.Combine(Application.StartupPath, "RememberMe.txt");
-
+        private string _Delim = "#//#";
         public frmLogin()
         {
             InitializeComponent();
@@ -53,18 +50,18 @@ namespace DVLD
             if (string.IsNullOrWhiteSpace(tbUserName.Text))
             {
                 errorProvider1.SetError(tbUserName, "Please Insert a Value");
-                IsValid= false;
-            }
-            else if (string.IsNullOrWhiteSpace(tbPassword.Text))
-            {
-                errorProvider1.SetError(tbPassword, "Please Insert a Value");
-                IsValid= false;
+                IsValid = false;
             }
             else
-            {
                 errorProvider1.SetError(tbUserName, "");
-                errorProvider1.SetError(tbPassword, "");
+
+            if (string.IsNullOrWhiteSpace(tbPassword.Text))
+            {
+                errorProvider1.SetError(tbPassword, "Please Insert a Value");
+                IsValid = false;
             }
+            else
+                errorProvider1.SetError(tbPassword, "");
 
             return IsValid;
         }
@@ -74,30 +71,21 @@ namespace DVLD
             if (!_Validation())
                 return;
 
-            clsSessionInfo.CurrentUser = clsUser.FindbyUserNameAndPassword(tbUserName.Text, tbPassword.Text);
+            clsUser user = clsUser.FindbyUserNameAndPassword(tbUserName.Text, tbPassword.Text);
 
-            if(clsSessionInfo.CurrentUser == null)
+            if(user == null)
             {
                 MessageBox.Show("Username or Password Is NOT correct","Login Fail",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                NumOfTries++;
                 return;
             }
             else 
             {
-                if (clsSessionInfo.CurrentUser.IsActive)
+                if (user.IsActive)
                 {
-                    if (chkRememberMe.Checked)
-                    {
-                        _RememberMe(enMode.Write);
-                    }
-                    else
-                    {
-                        if (File.Exists(_DestinationFile))
-                            File.Delete(_DestinationFile);
-                    }
-
+                    _RememberUsernameAndPassword();
+                    clsSessionInfo.CurrentUser = user;
                     this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
@@ -105,38 +93,74 @@ namespace DVLD
                 {
                     MessageBox.Show("Your Account Isn't Active, Call Your Admin", "Login Fail",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    NumOfTries++;
                 }
             }
         }
 
-        void _RememberMe(enMode Mode)
+        void _GetStoredCredentials()
         {
-            if(Mode == enMode.Read)
+            if (!System.IO.File.Exists(_DestinationFile))
             {
-                if (!System.IO.File.Exists(_DestinationFile))
-                {
-                    return;
-                }
+                return;
+            }
 
-                string Line = File.ReadAllText(_DestinationFile);
-                string[] Fields = Line.Split('#');
+            string Line = "";
+            try
+            {
+                Line = File.ReadAllText(_DestinationFile);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return;
+            }
+            string[] Fields = Line.Split(_Delim.ToCharArray());
+            if (Fields.Length == 2)
+            {
                 tbUserName.Text = Fields[0];
                 tbPassword.Text = clsUser.DecryptPassword(Fields[1]);
                 chkRememberMe.Checked = true;
             }
-            else if(Mode == enMode.Write && chkRememberMe.Checked)
+            else
             {
-                string Line = $"{tbUserName.Text.Trim()}#{clsUser.EncryptPassword(tbPassword.Text.Trim())}";
-                File.WriteAllText(_DestinationFile, Line);
+                MessageBox.Show("Can't Remember The Credentials.");
+            }
+        }
+
+        void _RememberUsernameAndPassword()
+        {
+            if (chkRememberMe.Checked)
+            {
+                string Line = $"{tbUserName.Text.Trim()}{_Delim}{clsUser.EncryptPassword(tbPassword.Text)}";
+                try
+                {
+                    File.WriteAllText(_DestinationFile, Line);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 chkRememberMe.Checked = true;
+            }
+            else
+            {
+                if (File.Exists(_DestinationFile))
+                {
+                    try
+                    {
+                        File.Delete(_DestinationFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
             }
         }
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
-            _RememberMe(enMode.Read);
+            _GetStoredCredentials();
         }
     }
 }
