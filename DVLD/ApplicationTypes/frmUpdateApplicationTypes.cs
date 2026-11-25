@@ -68,9 +68,11 @@ namespace DVLD.ApplicationTypes
             {
                 MessageBox.Show($"Application [{_ApplicationTypeID}] Saved Successfully", "Done",
                                 MessageBoxButtons.OK);
-                
+
                 DataUpdatedEvent?.Invoke();
             }
+            else
+                MessageBox.Show("Error: Data Is not Saved Successfully.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnClose_Click(object sender, EventArgs e)

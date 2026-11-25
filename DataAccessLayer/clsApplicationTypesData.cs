@@ -27,7 +27,6 @@ namespace DataAccessLayer
                 {
                     IsFound = true;
 
-                    ApplicationTypeID = (int)reader["ApplicationTypeID"];
                     ApplicationTypeTitle = reader["ApplicationTypeTitle"].ToString();
                     ApplicationFees = Convert.ToDecimal(reader["ApplicationFees"]);
                 }
